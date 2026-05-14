@@ -40,20 +40,23 @@ const CSS = `
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{background:#E8E0F0;font-family:'Nunito',sans-serif;}
 .shell{width:100%;max-width:480px;margin:0 auto;min-height:100vh;background:#FFF9F5;position:relative;overflow:hidden;}
-@media(min-width:500px){.shell{box-shadow:0 0 60px rgba(90,62,90,0.2);}}
-.btn{border:none;cursor:pointer;font-family:inherit;transition:transform .15s;}
-.btn:active{transform:scale(0.93);}
-.card{background:white;border-radius:20px;box-shadow:0 2px 16px rgba(120,90,140,0.07);}
+@media(min-width:500px){.shell{box-shadow:0 0 80px rgba(90,62,90,0.25);border-radius:32px;margin:20px auto;min-height:calc(100vh - 40px);overflow:hidden;}}
+.btn{border:none;cursor:pointer;font-family:inherit;transition:all .18s;}
+.btn:active{transform:scale(0.92);}
+.card{background:white;border-radius:22px;box-shadow:0 2px 20px rgba(120,90,140,0.08);}
+.card:hover{box-shadow:0 4px 24px rgba(120,90,140,0.13);transition:box-shadow .2s;}
 .dscroll{display:flex;gap:7px;overflow-x:auto;padding:0 16px 16px;scrollbar-width:none;}
 .dscroll::-webkit-scrollbar{display:none;}
-.tab{flex:1;padding:10px 4px;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:16px;transition:all .2s;}
-.abtn{border-radius:16px;padding:13px 12px;font-weight:800;font-size:13px;display:flex;align-items:center;gap:8px;border:none;cursor:pointer;font-family:inherit;transition:transform .15s;}
-.abtn:active{transform:scale(0.93);}
-.ov{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(50,20,50,.4);display:flex;align-items:flex-end;justify-content:center;z-index:999;backdrop-filter:blur(5px);}
-.mb{background:white;border-radius:24px 24px 0 0;padding:28px 22px 44px;width:100%;max-width:480px;animation:sup .25s ease;}
+.tab{flex:1;padding:11px 4px;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:16px;transition:all .2s;}
+.abtn{border-radius:18px;padding:16px 14px;font-weight:800;font-size:14px;display:flex;align-items:center;gap:10px;border:none;cursor:pointer;font-family:inherit;transition:all .18s;width:100%;}
+.abtn:active{transform:scale(0.96);}
+.abtn:hover{filter:brightness(1.04);}
+.ov{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(50,20,50,.45);display:flex;align-items:flex-end;justify-content:center;z-index:999;backdrop-filter:blur(6px);}
+.mb{background:white;border-radius:28px 28px 0 0;padding:28px 22px 48px;width:100%;max-width:480px;animation:sup .28s cubic-bezier(.34,1.2,.64,1);}
 .fi{animation:fin .3s ease;}
 .pi{animation:pin .35s cubic-bezier(.34,1.56,.64,1);}
 .pu{animation:pul 1.5s ease-in-out infinite;}
+.section-label{font-size:10px;font-weight:800;letter-spacing:2px;color:#C8B0C8;text-transform:uppercase;margin-bottom:8px;}
 @keyframes fin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pin{from{opacity:0;transform:scale(.87)}to{opacity:1;transform:scale(1)}}
 @keyframes sup{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -63,6 +66,7 @@ html,body{background:#E8E0F0;font-family:'Nunito',sans-serif;}
 @keyframes twk{0%,100%{opacity:.9;transform:scale(1)}50%{opacity:.2;transform:scale(.5)}}
 @keyframes zup{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-18px)}}
 @keyframes spk{0%{transform:rotate(var(--a)) translateX(0);opacity:1}100%{transform:rotate(var(--a)) translateX(26px);opacity:0}}
+@keyframes notifSlide{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
 `;
 
 /* ─── Baby Illustration ─────────────────────────────────────────── */
@@ -412,7 +416,7 @@ function Growth({grecs,onAdd,onDel,weeks}) {
 
 /* ─── AI Assistant ──────────────────────────────────────────────── */
 function AI({recs,grecs,weeks,activeUyku}) {
-  const [msgs,setMsgs]=useState([{role:"assistant",text:`Merhaba! 👶✨ Rena'nın kayıtlarına bakarak sorularınızı yanıtlayabilirim. Ne öğrenmek istersiniz?`}]);
+  const [msgs,setMsgs]=useState([{role:"assistant",text:`Merhaba! 👶✨ Özerden'in kayıtlarına bakarak sorularınızı yanıtlayabilirim. Ne öğrenmek istersiniz?`}]);
   const [inp,setInp]=useState("");
   const [loading,setLoading]=useState(false);
   const bot=useRef(null);
@@ -428,7 +432,7 @@ function AI({recs,grecs,weeks,activeUyku}) {
     const gr=grecs.length>0?"\n\nBüyüme:\n"+[...grecs].sort((a,b)=>b.hafta-a.hafta).slice(0,4).map(e=>`${e.hafta}h: ${e.kilo?e.kilo+"kg":""}${e.boy?" "+e.boy+"cm":""}${e.bas?" baş"+e.bas+"cm":""}`).join("\n"):"";
     const sw=activeUyku?`\nŞu an uyuyor (${Math.round((Date.now()-new Date(activeUyku).getTime())/60000)} dk)`:
       (()=>{const l=recs.filter(r=>r.type==="uyku").sort((a,b)=>new Date(b.time)-new Date(a.time))[0];return l?`\nSon uykudan ${Math.round((Date.now()-new Date(l.time).getTime())/60000)} dk geçti`:""})();
-    return `Sen yenidoğan bakım asistanısın. Türkçe, sıcak ve pratik yanıt ver. Kısa madde madde yaz. Tıbbi tavsiye değil genel rehberlik.\n\nBebek adı Rena, ${weeks} haftalık.${sw}\n\nSon 7 gün:\n${d7}${gr}`;
+    return `Sen yenidoğan bakım asistanısın. Türkçe, sıcak ve pratik yanıt ver. Kısa madde madde yaz. Tıbbi tavsiye değil genel rehberlik.\n\nBebek adı Özerden, ${weeks} haftalık.${sw}\n\nSon 7 gün:\n${d7}${gr}`;
   }
   async function send(txt){
     const msg=(txt||inp).trim();if(!msg||loading)return;
@@ -489,14 +493,172 @@ function AI({recs,grecs,weeks,activeUyku}) {
   );
 }
 
+/* ─── Beslenme Timer ────────────────────────────────────────────── */
+function BeslenmeTimer({ now, form, setForm, onSave, onCancel }) {
+  const tur = form.tur || "anne-sütü";
+  const isAnne = tur === "anne-sütü";
+
+  // Timer state: sol/sag accumulated ms + active side + startedAt
+  const [timer, setTimer] = useState({ sol:0, sag:0, active:null, startAt:null });
+  const [tNow, setTNow] = useState(Date.now());
+
+  useEffect(()=>{
+    if(!timer.active) return;
+    const t = setInterval(()=>setTNow(Date.now()), 500);
+    return ()=>clearInterval(t);
+  }, [timer.active]);
+
+  function liveSol() { return timer.sol + (timer.active==="sol" ? tNow-(timer.startAt||tNow) : 0); }
+  function liveSag() { return timer.sag + (timer.active==="sag" ? tNow-(timer.startAt||tNow) : 0); }
+  function fmtSec(ms) { const s=Math.floor(ms/1000); return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`; }
+
+  function toggleSide(side) {
+    setTimer(t=>{
+      const nowMs = Date.now();
+      if(t.active===side) {
+        // pause
+        const acc = t[side] + (nowMs-(t.startAt||nowMs));
+        return {...t, [side]:acc, active:null, startAt:null};
+      } else {
+        // switch or start — first save accumulated time of previous side
+        let updated = {...t};
+        if(t.active) {
+          const prev = t[t.active] + (nowMs-(t.startAt||nowMs));
+          updated = {...updated, [t.active]:prev};
+        }
+        return {...updated, active:side, startAt:nowMs};
+      }
+    });
+    setTNow(Date.now());
+  }
+
+  function handleSave(e) {
+    // Finalize any running timer
+    let finalTimer = {...timer};
+    if(timer.active) {
+      const nowMs = Date.now();
+      finalTimer[timer.active] = timer[timer.active] + (nowMs-(timer.startAt||nowMs));
+      finalTimer.active = null;
+    }
+    const solSec = Math.floor(finalTimer.sol/1000);
+    const sagSec = Math.floor(finalTimer.sag/1000);
+    const totalMin = Math.round((finalTimer.sol+finalTimer.sag)/60000);
+    onSave({
+      tur, miktar: form.miktar||null,
+      taraf: solSec>0&&sagSec>0?"iki": solSec>0?"sol": sagSec>0?"sag": form.taraf||null,
+      solSure: solSec, sagSure: sagSec, toplamDk: totalMin
+    }, e);
+  }
+
+  const solMs = liveSol(), sagMs = liveSag();
+  const totalMs = solMs + sagMs;
+  const hasTime = totalMs > 0;
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:14}}>
+      {/* Tür seçimi */}
+      <div>
+        <div style={{fontSize:10,fontWeight:800,color:"#C0B0C0",letterSpacing:1.5,textTransform:"uppercase",marginBottom:8}}>Tür</div>
+        <div style={{display:"flex",gap:8}}>
+          {["anne-sütü","mama","formül"].map(t=>(
+            <button key={t} className="btn" style={{flex:1,padding:"10px 4px",borderRadius:12,fontWeight:800,fontSize:11,
+              background:tur===t?"linear-gradient(135deg,#F5924E,#E07030)":TYPES.beslenme.bg,
+              color:tur===t?"white":TYPES.beslenme.color,
+              boxShadow:tur===t?`0 3px 12px ${TYPES.beslenme.glow}`:"none"}}
+              onClick={()=>{setForm(f=>({...f,tur:t,taraf:null}));setTimer({sol:0,sag:0,active:null,startAt:null});}}>
+              {t==="anne-sütü"?"Anne Sütü":t==="mama"?"Mama":"Formül"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Anne sütü zamanlayıcı */}
+      {isAnne && (
+        <>
+          {/* Toplam süre göstergesi */}
+          <div style={{textAlign:"center",padding:"10px 0 4px"}}>
+            <div style={{fontSize:10,fontWeight:800,color:"#C0B0C0",letterSpacing:2,textTransform:"uppercase",marginBottom:4}}>Toplam Süre</div>
+            <div style={{fontFamily:"monospace",fontSize:36,fontWeight:900,color:hasTime?"#F5924E":"#E0D0D0",letterSpacing:2,lineHeight:1}}>
+              {fmtSec(totalMs)}
+            </div>
+          </div>
+
+          {/* Sol / Sağ zamanlayıcı butonları */}
+          <div style={{display:"flex",gap:10}}>
+            {[["sol","◀ Sol",solMs],["sag","Sağ ▶",sagMs]].map(([side,lbl,ms])=>{
+              const isActive = timer.active===side;
+              return (
+                <button key={side} className="btn" onClick={()=>toggleSide(side)}
+                  style={{flex:1,padding:"18px 8px",borderRadius:20,fontFamily:"Nunito",border:"none",
+                    background:isActive?"linear-gradient(135deg,#F5924E,#E07030)":ms>0?"#FFF0E6":"#F8F4FF",
+                    color:isActive?"white":ms>0?"#F5924E":"#C0B0C0",
+                    boxShadow:isActive?`0 6px 20px ${TYPES.beslenme.glow}`:"none",
+                    transition:"all .2s"}}>
+                  <div style={{fontSize:13,fontWeight:800,marginBottom:4}}>{lbl}</div>
+                  <div style={{fontFamily:"monospace",fontSize:24,fontWeight:900,letterSpacing:1}}>{fmtSec(ms)}</div>
+                  <div style={{fontSize:11,marginTop:4,opacity:.8,fontWeight:700}}>
+                    {isActive?"⏸ Duraklat":"▶ Başlat"}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {timer.active && (
+            <div style={{textAlign:"center",fontSize:12,color:"#F5924E",fontWeight:700,animation:"pul 1.5s ease-in-out infinite"}}>
+              ● {timer.active==="sol"?"Sol":"Sağ"} meme aktif
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Mama/formül için miktar */}
+      {!isAnne && (
+        <div>
+          <div style={{fontSize:10,fontWeight:800,color:"#C0B0C0",letterSpacing:1.5,textTransform:"uppercase",marginBottom:8}}>Miktar (ml)</div>
+          <input type="number" placeholder="örn. 60"
+            style={{width:"100%",border:"2.5px solid #FFDFC8",borderRadius:12,padding:"12px 13px",fontSize:15,color:"#3A2A3A",outline:"none",fontFamily:"Nunito",fontWeight:700}}
+            value={form.miktar||""} onChange={e=>setForm(f=>({...f,miktar:e.target.value}))}/>
+        </div>
+      )}
+
+      {/* Miktar (anne sütü için opsiyonel) */}
+      {isAnne && (
+        <div>
+          <div style={{fontSize:10,fontWeight:800,color:"#C0B0C0",letterSpacing:1.5,textTransform:"uppercase",marginBottom:6}}>Miktar (ml) — isteğe bağlı</div>
+          <input type="number" placeholder="örn. 60"
+            style={{width:"100%",border:"2.5px solid #FFDFC8",borderRadius:12,padding:"11px 13px",fontSize:15,color:"#3A2A3A",outline:"none",fontFamily:"Nunito",fontWeight:700}}
+            value={form.miktar||""} onChange={e=>setForm(f=>({...f,miktar:e.target.value}))}/>
+        </div>
+      )}
+
+      {/* Kaydet / İptal */}
+      <div style={{display:"flex",gap:8,marginTop:4}}>
+        <button className="btn" onClick={onCancel}
+          style={{flex:1,padding:"13px",borderRadius:16,background:"#F5F0FC",color:"#9C7C9C",fontWeight:800,fontSize:13,fontFamily:"Nunito"}}>
+          İptal
+        </button>
+        <button className="btn" onClick={handleSave}
+          style={{flex:2,padding:"13px",borderRadius:16,background:"linear-gradient(135deg,#F5924E,#E07030)",color:"white",fontWeight:900,fontSize:14,fontFamily:"Nunito",
+            boxShadow:`0 5px 18px ${TYPES.beslenme.glow}`}}>
+          {hasTime?`✓ Kaydet · ${fmtSec(totalMs)}`:"✓ Kaydet"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Record Item ──────────────────────────────────────────────── */
 function RItem({r,onDel}) {
   const t=TYPES[r.type];
   let det="";
   if(r.type==="uyku")det=r.sure!=null?`${Math.floor(r.sure/60)}s ${r.sure%60}dk uyudu`:"";
   if(r.type==="beslenme"){
-    const tarafLbl=r.taraf==="sol"?"◀ Sol":r.taraf==="sag"?"Sağ ▶":r.taraf==="iki"?"↔ Her İkisi":null;
-    det=[r.tur,tarafLbl,r.miktar?r.miktar+" ml":null].filter(Boolean).join(" · ");
+    const tarafLbl=r.taraf==="sol"?"◀ Sol":r.taraf==="sag"?"Sağ ▶":r.taraf==="iki"?"↔ Her İki":null;
+    const sureLbl=r.solSure||r.sagSure
+      ? [r.solSure?`Sol ${Math.floor(r.solSure/60)}dk`:null, r.sagSure?`Sağ ${Math.floor(r.sagSure/60)}dk`:null].filter(Boolean).join(" + ")
+      : r.toplamDk?`${r.toplamDk} dk`:null;
+    det=[r.tur,tarafLbl,sureLbl,r.miktar?r.miktar+" ml":null].filter(Boolean).join(" · ");
   }
   if(r.type==="gaz"){
     const gazLbl={süper:"🏆 Süper Gaz! Adeta bir profesyonel",iyi:"😌 Güzel çıktı, rahatlamış",biraz:"🤏 Biraz çıktı",zorlu:"😤 Zorlandı, gaz sancısı vardı"};
@@ -533,6 +695,62 @@ export default function App() {
   const [now,     setNow]     = useState(Date.now());
   const [showW,   setShowW]   = useState(false);
   const [sparks,  setSparks]  = useState([]);
+
+  const [notifPerm, setNotifPerm] = useState(()=>typeof Notification!=="undefined"?Notification.permission:"default");
+  const lastNotifRef = useRef({sleep:0, feed:0});
+
+  // Request notification permission
+  async function requestNotif() {
+    if(typeof Notification==="undefined")return;
+    const p = await Notification.requestPermission();
+    setNotifPerm(p);
+  }
+
+  function sendNotif(title, body, icon="🌸") {
+    if(notifPerm!=="granted")return;
+    try {
+      if(navigator.serviceWorker?.controller) {
+        navigator.serviceWorker.ready.then(reg => {
+          reg.showNotification(title, { body, icon:"/icon-192.png", badge:"/icon-192.png", vibrate:[200,100,200] });
+        });
+      } else {
+        new Notification(title, { body });
+      }
+    } catch(e) {}
+  }
+
+  // Notification checker — runs every minute
+  useEffect(()=>{
+    if(notifPerm!=="granted") return;
+    const check = () => {
+      const nowMs = Date.now();
+      const ww = getWW(weeks);
+
+      // Sleep notification
+      if(!uyku) {
+        const lastSleep = recs.filter(r=>r.type==="uyku").sort((a,b)=>new Date(b.time)-new Date(a.time))[0];
+        if(lastSleep) {
+          const awakeMin = Math.floor((nowMs - new Date(lastSleep.time).getTime()) / 60000);
+          if(awakeMin >= ww.ideal && nowMs - lastNotifRef.current.sleep > 30*60*1000) {
+            sendNotif("🌙 Özerden uyuma vakti!", `${awakeMin} dakikadır uyanık — şimdi uyutma zamanı`);
+            lastNotifRef.current.sleep = nowMs;
+          }
+        }
+      }
+
+      // Feeding notification — if more than 3 hours since last feed
+      const lastFeed = recs.filter(r=>r.type==="beslenme").sort((a,b)=>new Date(b.time)-new Date(a.time))[0];
+      if(lastFeed) {
+        const feedMin = Math.floor((nowMs - new Date(lastFeed.time).getTime()) / 60000);
+        if(feedMin >= 180 && nowMs - lastNotifRef.current.feed > 60*60*1000) {
+          sendNotif("🍼 Özerden'in beslenmesi!", `Son beslemeden ${Math.floor(feedMin/60)} saat ${feedMin%60} dk geçti`);
+          lastNotifRef.current.feed = nowMs;
+        }
+      }
+    };
+    const t = setInterval(check, 60000);
+    return () => clearInterval(t);
+  }, [notifPerm, uyku, recs, weeks]);
 
   useEffect(()=>lss(SK,recs),[recs]);
   useEffect(()=>lss(SK+"-g",grecs),[grecs]);
@@ -573,12 +791,23 @@ export default function App() {
           <div style={{padding:"18px 18px 0",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
             <div>
               <div style={{fontSize:9,fontWeight:800,letterSpacing:3,color:"#C0A0A0",textTransform:"uppercase"}}>Lazy Baby</div>
-              <div style={{fontFamily:"'Comfortaa',cursive",fontSize:21,fontWeight:700,color:"#5A3E5A",lineHeight:1.2}}>Rena'nın Takibi 🌸</div>
+              <div style={{fontFamily:"'Comfortaa',cursive",fontSize:21,fontWeight:700,color:"#5A3E5A",lineHeight:1.2}}>Özerden'in Takibi 🌸</div>
             </div>
+            <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:6}}>
+              {notifPerm==="default" && (
+                <button className="btn" onClick={requestNotif}
+                  style={{background:"linear-gradient(135deg,#8B7FD4,#6B5FB4)",color:"white",borderRadius:12,padding:"6px 10px",fontSize:10,fontWeight:800,boxShadow:"0 3px 10px rgba(107,95,180,.3)"}}>
+                  🔔 Bildirim Aç
+                </button>
+              )}
+              {notifPerm==="granted" && (
+                <div style={{background:"rgba(107,191,107,.15)",borderRadius:10,padding:"4px 8px",fontSize:9,fontWeight:800,color:"#4CAF50"}}>🔔 Aktif</div>
+              )}
             <button className="btn" onClick={()=>setShowW(true)} style={{background:"rgba(255,255,255,.75)",borderRadius:14,padding:"8px 12px",textAlign:"center",boxShadow:"0 2px 10px rgba(90,62,90,.1)"}}>
               <div style={{fontSize:20}}>👶</div>
               <div style={{fontSize:11,fontWeight:900,color:"#5A3E5A"}}>{weeks} hafta</div>
             </button>
+            </div>
           </div>
           <div style={{display:"flex",justifyContent:"center",padding:"6px 0 2px"}}>
             <Baby sleeping={!!uyku}/>
@@ -623,7 +852,7 @@ export default function App() {
         {/* ── QUICK ACTIONS ── */}
         {isToday&&(
           <div style={{padding:"12px 16px 0"}}>
-            <div style={{fontSize:10,fontWeight:800,letterSpacing:2,color:"#C8B0C8",textTransform:"uppercase",marginBottom:8}}>Hızlı Ekle</div>
+            <div className="section-label">Hızlı Ekle</div>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               <button className="abtn" onClick={e=>doUyku(e)}
                 style={{background:uyku?"linear-gradient(135deg,#8B7FD4,#6B5FB4)":TYPES.uyku.bg,color:uyku?"white":TYPES.uyku.color,boxShadow:uyku?`0 4px 16px ${TYPES.uyku.glow}`:"none",padding:"17px 18px",fontSize:15,borderRadius:18}}>
@@ -668,7 +897,7 @@ export default function App() {
                 <div style={{fontSize:11,color:"#C0B0C0",fontWeight:700}}>{dayRecs.length} kayıt</div>
               </div>
               {dayRecs.length===0
-                ?<div style={{textAlign:"center",color:"#C0A0C0",padding:"40px 0"}}><div style={{fontSize:44,marginBottom:8,animation:"flt 3s ease-in-out infinite"}}>🌸</div><div style={{fontSize:13,fontWeight:700}}>{isToday?"Rena için henüz kayıt yok":"Bu güne ait kayıt yok"}</div></div>
+                ?<div style={{textAlign:"center",color:"#C0A0C0",padding:"40px 0"}}><div style={{fontSize:44,marginBottom:8,animation:"flt 3s ease-in-out infinite"}}>🌸</div><div style={{fontSize:13,fontWeight:700}}>{isToday?"Özerden için henüz kayıt yok":"Bu güne ait kayıt yok"}</div></div>
                 :dayRecs.map(r=><RItem key={r.id} r={r} onDel={delRec}/>)}
             </div>
           )}
@@ -715,51 +944,22 @@ export default function App() {
         {modal&&(
           <div className="ov" onClick={()=>setModal(null)}>
             <div className="mb" onClick={e=>e.stopPropagation()}>
-              <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
+              {modal!=="beslenme"&&<div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
                 <div style={{width:42,height:42,borderRadius:14,background:TYPES[modal].bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,boxShadow:`0 3px 10px ${TYPES[modal].glow}`}}>{TYPES[modal].emoji}</div>
                 <div style={{fontFamily:"'Comfortaa',cursive",fontSize:19,fontWeight:700,color:"#5A3E5A"}}>{TYPES[modal].label} Ekle</div>
-              </div>
+              </div>}
               {modal==="beslenme"&&(
-                <div style={{display:"flex",flexDirection:"column",gap:12}}>
-                  <div style={{fontSize:10,fontWeight:800,color:"#C0B0C0",letterSpacing:1.5,textTransform:"uppercase"}}>Tür</div>
-                  <div style={{display:"flex",gap:8}}>
-                    {["anne-sütü","mama","formül"].map(t=>(
-                      <button key={t} className="btn" style={{flex:1,padding:"10px 4px",borderRadius:12,fontWeight:800,fontSize:11,
-                        background:(form.tur||"anne-sütü")===t?"linear-gradient(135deg,#F5924E,#E07030)":TYPES.beslenme.bg,
-                        color:(form.tur||"anne-sütü")===t?"white":TYPES.beslenme.color,
-                        boxShadow:(form.tur||"anne-sütü")===t?`0 3px 12px ${TYPES.beslenme.glow}`:"none"}}
-                        onClick={()=>setForm(f=>({...f,tur:t,taraf:null}))}>
-                        {t==="anne-sütü"?"Anne Sütü":t==="mama"?"Mama":"Formül"}
-                      </button>
-                    ))}
-                  </div>
-
-                  {(form.tur||"anne-sütü")==="anne-sütü"&&(
-                    <>
-                      <div style={{fontSize:10,fontWeight:800,color:"#C0B0C0",letterSpacing:1.5,textTransform:"uppercase"}}>Meme</div>
-                      <div style={{display:"flex",gap:8}}>
-                        {[["sol","◀ Sol"],["sag","Sağ ▶"],["iki","↔ Her İkisi"]].map(([v,lbl])=>(
-                          <button key={v} className="btn" style={{flex:1,padding:"12px 4px",borderRadius:12,fontWeight:800,fontSize:12,
-                            background:form.taraf===v?"linear-gradient(135deg,#F5924E,#E07030)":TYPES.beslenme.bg,
-                            color:form.taraf===v?"white":TYPES.beslenme.color,
-                            boxShadow:form.taraf===v?`0 3px 12px ${TYPES.beslenme.glow}`:"none"}}
-                            onClick={()=>setForm(f=>({...f,taraf:v}))}>
-                            {lbl}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-
-                  <div style={{fontSize:10,fontWeight:800,color:"#C0B0C0",letterSpacing:1.5,textTransform:"uppercase"}}>Miktar (ml) — isteğe bağlı</div>
-                  <input type="number" placeholder="örn. 60"
-                    style={{border:"2.5px solid #FFDFC8",borderRadius:12,padding:"12px 13px",fontSize:15,color:"#3A2A3A",outline:"none",fontFamily:"Nunito",fontWeight:700}}
-                    value={form.miktar||""} onChange={e=>setForm(f=>({...f,miktar:e.target.value}))}/>
-                </div>
+                <BeslenmeTimer
+                  now={now}
+                  form={form}
+                  setForm={setForm}
+                  onSave={(extra,e)=>{addRec("beslenme",extra,e);setModal(null);}}
+                  onCancel={()=>setModal(null)}
+                />
               )}
               {modal==="gaz"&&(
                 <div style={{display:"flex",flexDirection:"column",gap:14}}>
-                  <div style={{textAlign:"center",fontSize:11,color:"#9C9C9C",marginBottom:4}}>Rena bugün ne kadar rahatladı? 😄</div>
+                  <div style={{textAlign:"center",fontSize:11,color:"#9C9C9C",marginBottom:4}}>Özerden bugün ne kadar rahatladı? 😄</div>
                   <div style={{display:"flex",flexDirection:"column",gap:10}}>
                     {[
                       {v:"süper",  e:"🏆", lbl:"Süper Gaz!",     sub:"Adeta bir profesyonel"},
@@ -797,14 +997,13 @@ export default function App() {
                   </div>
                 </div>
               )}
-              <button className="btn" onClick={e=>{
-                if(modal==="beslenme")addRec("beslenme",{miktar:form.miktar||null,tur:form.tur||"anne-sütü",taraf:form.taraf||null},e);
-                else if(modal==="kaka")addRec("kaka",{renk:form.renk||null},e);
+              {modal!=="beslenme"&&<button className="btn" onClick={e=>{
+                if(modal==="kaka")addRec("kaka",{renk:form.renk||null},e);
                 else if(modal==="gaz")addRec("gaz",{gazdurumu:form.gazdurumu||"iyi"},e);
                 setModal(null);
               }} style={{width:"100%",marginTop:22,padding:"15px",borderRadius:16,background:`linear-gradient(135deg,${TYPES[modal].color},${TYPES[modal].color}CC)`,color:"white",fontWeight:900,fontSize:15,fontFamily:"Nunito",boxShadow:`0 5px 18px ${TYPES[modal].glow}`}}>
-                {modal==="gaz"?form.gazdurumu==="süper"?"🏆 Tebrikler Rena! Kaydet":form.gazdurumu==="iyi"?"😌 Güzel! Kaydet":form.gazdurumu==="biraz"?"🤏 Kaydet":form.gazdurumu==="zorlu"?"😤 Geçer Rena! Kaydet":"💨 Kaydet":"✓ Kaydet"}
-              </button>
+                {modal==="gaz"?form.gazdurumu==="süper"?"🏆 Tebrikler Özerden! Kaydet":form.gazdurumu==="iyi"?"😌 Güzel! Kaydet":form.gazdurumu==="biraz"?"🤏 Kaydet":form.gazdurumu==="zorlu"?"😤 Geçer Özerden! Kaydet":"💨 Kaydet":"✓ Kaydet"}
+              </button>}
             </div>
           </div>
         )}
